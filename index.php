@@ -47,12 +47,12 @@
   </style>
 </head>
 <body>
-  <h1>Cat Art</h1>
+  <h1>Cat Art 🐱</h1>
   <div id="gallery">Loading…</div>
 
   <script>
     const galleryEl = document.getElementById('gallery');
-    const apiUrl = 'https://api.artic.edu/api/v1/artworks/search?q=cats&limit=12&fields=id,title,image_id,artist_display';
+    const apiUrl = 'https://api.artic.edu/api/v1/artworks/search?q=cats&limit=12&fields=id,title,image_id,artist_display,_score';
 
     async function fetchArtworks() {
       try {
@@ -67,13 +67,11 @@
         galleryEl.innerHTML = '';  // clear “Loading…”
 
         artworks.forEach(item => {
-          const { id, title, image_id, artist_display } = item;
+          const { id, title, image_id, artist_display, _score } = item;
           // If no image_id, skip
           if (!image_id) return;
 
           // Construct image URL via IIIF (per API docs)
-          // E.g. `${iiif_url}/{image_id}/full/843,/0/default.jpg`
-          // “iiif_url” is in data.config. E.g. data.config.iiif_url
           const iiifUrl = config.iiif_url;
           const imgUrl = `${iiifUrl}/${image_id}/full/400,/0/default.jpg`;
 
@@ -91,8 +89,13 @@
           const p = document.createElement('p');
           p.textContent = artist_display || 'Unknown artist';
 
+          // Added: ID and _score
+          const meta = document.createElement('p');
+          meta.textContent = `ID: ${id} | Score: ${_score}`;
+
           info.appendChild(h3);
           info.appendChild(p);
+          info.appendChild(meta);
 
           card.appendChild(img);
           card.appendChild(info);
